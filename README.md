@@ -27,6 +27,50 @@ Cursor (chat) ──MCP (stdio JSON-RPC)──> mcp-azure-devops (TypeScript)
 
 ## Setup
 
+### Automated Setup (Recommended)
+
+**1. Create a Personal Access Token (PAT) in Azure DevOps:**
+- Go to **User Settings → Personal access tokens → New Token**
+- Required permissions: **Work Items: Read & Write**, **Build: Read**, **Project and Team: Read**
+
+**2. Run the setup script:**
+
+**macOS/Linux:**
+```bash
+git clone <repository-url>
+cd ado_mcp
+npm install
+./setup-mcp.sh
+```
+
+**Windows PowerShell:**
+```powershell
+git clone <repository-url>
+cd ado_mcp
+npm install
+Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser  # if needed
+.\setup-mcp.ps1
+```
+
+**3. Follow the prompts to enter:**
+- Azure DevOps Organization (e.g., "mycompany")
+- Azure DevOps Project (optional)
+- Personal Access Token
+
+**4. Restart Cursor completely** and test with: *"List my Azure DevOps projects"*
+
+The setup script will automatically:
+- Build the TypeScript project
+- Find your Node.js installation
+- Create/update your Cursor MCP configuration (`~/.cursor/mcp.json`)
+- Back up any existing configurations
+
+---
+
+### Manual Setup
+
+**If the automated setup doesn't work, you can configure manually:**
+
 ### Step 1: Create a Personal Access Token (PAT)
 
 1. In Azure DevOps, go to **User Settings → Personal access tokens → New Token**
@@ -183,10 +227,39 @@ work_item_create {
 
 ## Troubleshooting
 
+### Setup Issues
+- **"Node.js not found"**: Install Node.js from [nodejs.org](https://nodejs.org/)
+- **"Permission denied" (macOS/Linux)**: Run `chmod +x setup-mcp.sh`
+- **"Execution policy" error (Windows)**: Run `Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser`
+- **"No tools found" in Cursor**: Restart Cursor completely and check MCP config file was created
+
+### Runtime Issues
 - **401/403 errors**: Token wrong, expired, or missing required scopes
 - **404 errors**: Wrong org/project/team name or insufficient access
 - **Board column changes don't work**: Set `System.State` mapped to that column (not the column field itself)
 - **Current sprint empty**: Team's iteration path may differ from project default—check team name and iteration settings
+
+### Manual Configuration
+If automated setup fails, manually edit your MCP config file:
+
+**Location**: `~/.cursor/mcp.json` (macOS/Linux) or `%USERPROFILE%\.cursor\mcp.json` (Windows)
+
+```json
+{
+  "mcpServers": {
+    "azure-devops": {
+      "command": "/path/to/node",
+      "args": ["/path/to/ado_mcp/dist/server.js"],
+      "env": {
+        "ADO_ORG": "your-org",
+        "ADO_PROJECT": "your-project",
+        "ADO_PAT": "your-pat"
+      },
+      "cwd": "/path/to/ado_mcp"
+    }
+  }
+}
+```
 
 ## Common Field Names
 
