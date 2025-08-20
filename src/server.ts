@@ -88,9 +88,7 @@ const BoardMoveSchema = z.object({
   iterationPath: z.string().optional(),
 });
 
-const DummySchema = z.object({
-  random_string: z.string(),
-});
+const EmptySchema = z.object({});
 
 // Server setup
 const server = new Server(
@@ -107,7 +105,7 @@ const server = new Server(
 
 // Helper function to convert Zod schemas to JSON Schema
 function zodToMcpSchema(zodSchema: z.ZodType) {
-  return zodToJsonSchema(zodSchema, "mySchema");
+  return zodToJsonSchema(zodSchema);
 }
 
 // List tools handler
@@ -118,14 +116,14 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
       {
         name: "list_projects",
         description: "List all projects in the Azure DevOps organization",
-        inputSchema: zodToMcpSchema(DummySchema),
+        inputSchema: zodToMcpSchema(EmptySchema),
       },
 
       // Pipeline/Build tools
       {
         name: "list_pipelines", 
         description: "List all pipelines in the Azure DevOps project",
-        inputSchema: zodToMcpSchema(DummySchema),
+        inputSchema: zodToMcpSchema(EmptySchema),
       },
       {
         name: "list_builds",
